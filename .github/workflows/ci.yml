@@ -1,0 +1,59 @@
+env:
+  RUBY_VERSION: 2.4
+
+name: Rails CI
+on: [push,pull_request]
+jobs:
+  rubocop:
+    if: false # skips rubocop
+    name: Rubocop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Install Rubocop
+        run: gem install rubocop
+      - name: Check code
+        run: rubocop
+  rspec:
+    name: RSpec
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Install postgres client
+        run: sudo apt-get install libpq-dev
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundler install
+      - name: Create database
+        run: |
+          cp config/database.ci.yml config/database.yml
+          bundler exec rake db:create RAILS_ENV=test
+          bundler exec rake db:migrate RAILS_ENV=test
+      - name: Run tests
+        run: bundler exec rspec
+      #- name: Upload coverage results
+      #  uses: actions/upload-artifact@master
+      #  if: always()
+      #  with:
+      #    name: coverage-report
+      #    path: coverage
