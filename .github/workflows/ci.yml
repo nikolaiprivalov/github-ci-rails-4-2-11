@@ -2,7 +2,7 @@ env:
   RUBY_VERSION: 2.4
 
 name: Rails CI
-on: [push,pull_request]
+on: push
 jobs:
   rubocop:
     if: false # skips rubocop
@@ -51,7 +51,7 @@ jobs:
           bundler exec rake db:migrate RAILS_ENV=test
       - name: Run tests
         run: bundler exec rspec
-      - name: Upload coverage results
+      - name: Upload coverage report
         uses: actions/upload-artifact@master
         if: always()
         with:
