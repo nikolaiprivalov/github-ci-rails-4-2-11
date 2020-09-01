@@ -2,7 +2,9 @@ env:
   RUBY_VERSION: 2.4
 
 name: Rails CI
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    ref: ${{ github.event.pull_request.head.ref }}
 jobs:
   rubocop:
     if: false # skips rubocop
