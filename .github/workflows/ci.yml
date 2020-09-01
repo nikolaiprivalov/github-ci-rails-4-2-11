@@ -2,7 +2,7 @@ env:
   RUBY_VERSION: 2.4
 
 name: Rails CI
-on: [workflow_dispatch]
+on: pull_request
 jobs:
   rubocop:
     if: false # skips rubocop
