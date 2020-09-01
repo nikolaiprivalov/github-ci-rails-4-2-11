@@ -1,0 +1,6 @@
+name: Trigger all
+uses: benc-uk/workflow-dispatch@v1
+with:
+  workflow: Rails CI
+  token: ${{ secrets.PERSONAL_TOKEN }}
+  ref: ${{ github.event.pull_request.head.ref }}
